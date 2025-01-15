@@ -1,4 +1,4 @@
-package com.um_project_game.Server;
+package com.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,8 +17,9 @@ public class MainServer {
 
     public void startServer() {
         try {
-            serverSocket = new ServerSocket(9000);
-            System.out.println("Server is listening on port 9000");
+            int port = Integer.parseInt(System.getenv("PORT")); // Get the port from Heroku
+            serverSocket = new ServerSocket(port);
+            System.out.println("Server started on port: " + port);
 
             while (true) {
                 Socket socket = serverSocket.accept();

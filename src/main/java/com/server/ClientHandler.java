@@ -1,4 +1,4 @@
-package com.um_project_game.Server;
+package com.server;
 
 import java.io.*;
 import java.net.Socket;
