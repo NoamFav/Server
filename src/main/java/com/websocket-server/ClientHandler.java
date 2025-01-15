@@ -37,9 +37,9 @@ public class ClientHandler extends Thread {
 
     private void assignRole() {
         synchronized (MainServer.clients) {
-            if (MainServer.clients.size() == 1) {
+            if (MainServer.clients.size() == 0) {
                 playerRole = "White";
-            } else if (MainServer.clients.size() == 2) {
+            } else if (MainServer.clients.size() == 1) {
                 playerRole = "Black";
             } else {
                 playerRole = "Spectator";
