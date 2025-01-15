@@ -1,1 +1,1 @@
-web: java -cp target/classes com.websocket_server.MainServer
+web: java -jar target/server-1.0-SNAPSHOT.jar
