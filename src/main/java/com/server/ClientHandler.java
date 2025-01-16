@@ -46,6 +46,7 @@ public class ClientHandler extends Thread {
             }
         }
         sendMessage("You are " + playerRole);
+        System.out.println(playerRole + " connected.");
     }
 
     public void sendMessage(String message) {
