@@ -17,9 +17,8 @@ public class MainServer {
 
     public void startServer() {
         try {
-            int port = Integer.parseInt(System.getenv("PORT")); // Get the port from Heroku
-            serverSocket = new ServerSocket(port);
-            System.out.println("Server started on port: " + port);
+            serverSocket = new ServerSocket(9000);
+            System.out.println("Server is listening on port 9000");
 
             while (true) {
                 Socket socket = serverSocket.accept();
