@@ -1,16 +1,20 @@
 package com.server;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ClientHandler extends Thread {
+class ClientHandler extends Thread {
     private Socket socket;
     private PrintWriter writer;
     private String playerRole;
 
     public ClientHandler(Socket socket) {
+        System.out.println("ClientHandler created");
         this.socket = socket;
-        assignRole();
+        this.playerRole = MainServer.assignRole(this);
     }
 
     @Override
@@ -20,11 +24,17 @@ public class ClientHandler extends Thread {
             writer = new PrintWriter(socket.getOutputStream(), true);
 
             String message;
+            System.out.println("Waiting for messages from " + playerRole);
             while ((message = reader.readLine()) != null) {
+                System.out.println(playerRole + " sent: " + message);
                 if (message.startsWith("CHAT")) {
                     MainServer.broadcast(message, this);
                 } else if (message.startsWith("MOVE")) {
                     handleMove(message);
+                } else if (message.equals("READY")) {
+                    sendMessage("You are " + playerRole);
+                    MainServer.broadcast(playerRole + " has joined the game.", null);
+                    System.out.println(playerRole + " has joined the game.");
                 }
             }
         } catch (IOException e) {
@@ -35,24 +45,18 @@ public class ClientHandler extends Thread {
         }
     }
 
-    private void assignRole() {
-        synchronized (MainServer.clients) {
-            if (MainServer.clients.size() == 0) {
-                playerRole = "White";
-            } else if (MainServer.clients.size() == 1) {
-                playerRole = "Black";
-            } else {
-                playerRole = "Spectator";
-            }
-        }
-        sendMessage("You are " + playerRole);
-        System.out.println(playerRole + " connected.");
-    }
-
     public void sendMessage(String message) {
         if (writer != null) {
             writer.println(message);
         }
+    }
+
+    public String getPlayerRole() {
+        return playerRole;
+    }
+
+    public void setPlayerRole(String role) {
+        this.playerRole = role;
     }
 
     private void handleMove(String moveCommand) {
@@ -63,30 +67,9 @@ public class ClientHandler extends Thread {
             return;
         }
 
-        String from = parts[1];
-        String to = parts[3];
-        System.out.println(playerRole + moveCommand);
+        System.out.println(playerRole + " " + moveCommand);
 
         // Broadcast the move to the other player
         MainServer.broadcast(moveCommand, this);
-    }
-
-    private void startTurnTimer() {
-        new Thread(
-                        () -> {
-                            try {
-                                int timeRemaining = 60; // 60 seconds per turn
-                                while (timeRemaining > 0) {
-                                    Thread.sleep(1000);
-                                    timeRemaining--;
-                                    sendMessage("Time remaining: " + timeRemaining + " seconds");
-                                }
-                                sendMessage("Time's up!");
-                                MainServer.broadcast(playerRole + " ran out of time!", this);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        })
-                .start();
     }
 }

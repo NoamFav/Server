@@ -1,6 +1,6 @@
 package com.server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -18,14 +18,16 @@ public class MainServer {
     public void startServer() {
         try {
             serverSocket = new ServerSocket(9000);
-            System.out.println("Server is listening on port 9000");
+            System.out.println("Server is listening on port 9000...");
 
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected");
 
                 ClientHandler clientHandler = new ClientHandler(socket);
-                clients.add(clientHandler);
+                synchronized (clients) {
+                    clients.add(clientHandler);
+                }
                 clientHandler.start();
             }
         } catch (IOException e) {
@@ -33,10 +35,25 @@ public class MainServer {
         }
     }
 
+    public static synchronized String assignRole(ClientHandler client) {
+        boolean whiteAssigned = clients.stream().anyMatch(c -> "White".equals(c.getPlayerRole()));
+        boolean blackAssigned = clients.stream().anyMatch(c -> "Black".equals(c.getPlayerRole()));
+
+        if (!whiteAssigned) {
+            return "White";
+        } else if (!blackAssigned) {
+            return "Black";
+        } else {
+            return "Spectator";
+        }
+    }
+
     public static void broadcast(String message, ClientHandler excludeClient) {
-        for (ClientHandler client : clients) {
-            if (client != excludeClient) {
-                client.sendMessage(message);
+        synchronized (clients) {
+            for (ClientHandler client : clients) {
+                if (client != excludeClient) {
+                    client.sendMessage(message);
+                }
             }
         }
     }
@@ -44,6 +61,27 @@ public class MainServer {
     public static void removeClient(ClientHandler client) {
         synchronized (clients) {
             clients.remove(client);
+        }
+        reassignRoles();
+    }
+
+    private static void reassignRoles() {
+        synchronized (clients) {
+            boolean whiteAssigned = false;
+            boolean blackAssigned = false;
+
+            for (ClientHandler client : clients) {
+                if (!whiteAssigned) {
+                    client.setPlayerRole("White");
+                    whiteAssigned = true;
+                } else if (!blackAssigned) {
+                    client.setPlayerRole("Black");
+                    blackAssigned = true;
+                } else {
+                    client.setPlayerRole("Spectator");
+                }
+                client.sendMessage("You are " + client.getPlayerRole());
+            }
         }
     }
 }
