@@ -35,6 +35,9 @@ class ClientHandler extends Thread {
                     sendMessage("You are " + playerRole);
                     MainServer.broadcast(playerRole + " has joined the game.", null);
                     System.out.println(playerRole + " has joined the game.");
+                } else if (message.startsWith("OPPONENT_NAME")) {
+                    String[] parts = message.split(" ");
+                    MainServer.broadcast("OPPONENT_NAME " + parts[1], this);
                 }
             }
         } catch (IOException e) {
