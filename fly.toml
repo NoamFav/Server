@@ -11,9 +11,5 @@ PORT = "9000"
   protocol = "tcp"
 
   [[services.ports]]
-    port = 80
+    port = 9000
     handlers = ["proxy_proto"]
-
-  [[services.ports]]
-    port = 443
-    handlers = ["tls"]
