@@ -1,0 +1,19 @@
+app = "server-billowing-bird-4582"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+PORT = "9000"
+
+[[services]]
+  internal_port = 9000
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["proxy_proto"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls"]

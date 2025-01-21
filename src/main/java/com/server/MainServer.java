@@ -1,6 +1,7 @@
 package com.server;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -17,8 +18,10 @@ public class MainServer {
 
     public void startServer() {
         try {
-            serverSocket = new ServerSocket(9000);
-            System.out.println("Server is listening on port 9000...");
+            int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "9000"));
+            serverSocket = new ServerSocket();
+            serverSocket.bind(new InetSocketAddress("0.0.0.0", port));
+            System.out.println("Server is listening on port " + port + "...");
 
             while (true) {
                 Socket socket = serverSocket.accept();
