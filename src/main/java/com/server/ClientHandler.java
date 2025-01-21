@@ -38,6 +38,9 @@ class ClientHandler extends Thread {
                 } else if (message.startsWith("OPPONENT_NAME")) {
                     String[] parts = message.split(" ");
                     MainServer.broadcast("OPPONENT_NAME " + parts[1], this);
+                } else if (message.equals("DISCONNECT")) {
+                    System.out.println(playerRole + " disconnected.");
+                    break;
                 }
             }
         } catch (IOException e) {
