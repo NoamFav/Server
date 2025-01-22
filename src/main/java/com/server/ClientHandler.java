@@ -41,6 +41,12 @@ class ClientHandler extends Thread {
                 } else if (message.equals("DISCONNECT")) {
                     System.out.println(playerRole + " disconnected.");
                     break;
+                } else if (message.equals("RESIGN")) {
+                    MainServer.broadcast(message, this);
+                } else if (message.startsWith("DRAW")) {
+                    MainServer.broadcast(message, this);
+                } else {
+                    sendMessage("Invalid command");
                 }
             }
         } catch (IOException e) {
